@@ -1,5 +1,4 @@
 const mssql = require('mssql')
-require('dotenv').config({path:'../../.env'})
 
 //MS SQLServer connection config
 const sqlConfig = {

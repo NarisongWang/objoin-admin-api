@@ -1,10 +1,10 @@
-const asyncHandler = require('express-async-handler');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin');
-const UserType = require('../models/UserType');
-const InstallationStatus = require('../models/InstallationStatus');
-const KitchenInstallChecklist = require('../models/KitchenInstallChecklist');
+const asyncHandler = require('express-async-handler')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const Admin = require('../models/Admin')
+const UserType = require('../models/UserType')
+const InstallationStatus = require('../models/InstallationStatus')
+const KitchenInstallChecklist = require('../models/KitchenInstallChecklist')
 
 // @desc    Register a new admin
 // @request POST

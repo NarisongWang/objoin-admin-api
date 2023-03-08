@@ -1,3 +1,4 @@
+require('dotenv').config({path:'.env'})
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -6,9 +7,7 @@ const bodyParser = require('body-parser')
 const adminRoutes = require('./routes/adminRoutes')
 const installationOrderRoutes = require('./routes/installationOrderRoutes')
 const mssqlRoutes = require('./routes/mssqlRoutes')
-const fileRoutes = require('./routes/fileRoutes')
 const { errorHandler } = require('./middlewares/errorHandler')
-require('dotenv').config({path:'../.env'})
 
 const app = express()
 app.use(bodyParser.json())
@@ -18,7 +17,6 @@ app.use(helmet())
 app.use(adminRoutes)
 app.use(installationOrderRoutes)
 app.use(mssqlRoutes)
-app.use(fileRoutes)
 
 app.use(errorHandler)
 
