@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Admin = require('../models/Admin')
+const User = require('../models/User')
 const UserType = require('../models/UserType')
 const InstallationStatus = require('../models/InstallationStatus')
 const KitchenInstallChecklist = require('../models/KitchenInstallChecklist')
@@ -91,12 +92,32 @@ const loginAdmin = asyncHandler( async( req, res ) =>{
     }
 })
 
+// @desc    Get all users
+// @request GET
+// @route   /admin/getallusers
+// @acccess Private
+const getAllUsers = asyncHandler( async(req, res) => {
+    try{
+        const users = await User.find({})
+        if(users){
+            res.status(200).send(users)
+        }else{
+            res.status(400)
+            throw new Error('Invalid query')
+        }
+    } catch (error) {
+        res.status(400)
+        throw error
+    }
+})
+
 //Generate token
 const generateToken = (id) =>{
     return jwt.sign({ id }, process.env.JWT_SECRET_ADMIN)
 }
 
 module.exports = {
+    getAllUsers,
     registerAdmin,
     loginAdmin
 }

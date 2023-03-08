@@ -148,9 +148,9 @@ const getInstallationOrder = asyncHandler(async (req, res) =>{
         const installationOrder = await InstallationOrder.findById(req.params.id)
         const users = await User.find({})
         // find all pdf files under the local file server directory
-        let newDir = process.env.LOCAL_FILE_SERVER2 + installationOrder.entryDate.toString().substring(11,15) + '\\' + installationOrder.customer + '\\' + installationOrder.shipName.trim() + ' - ' + installationOrder.shipAddress
-        newDir = newDir.substring(0,newDir.length-6) + ' - ' + installationOrder.installationOrderNumber
-        const files = await findPdfFiles(newDir)
+        let fileDir = `${process.env.LOCAL_FILE_SERVER2+installationOrder.entryDate.toString().substring(11,15)}\\${installationOrder.customer}\\${installationOrder.shipName.trim()} - ${installationOrder.shipAddress}`
+        fileDir = fileDir.substring(0,fileDir.length-6) + ' - ' + installationOrder.installationOrderNumber
+        const files = await findPdfFiles(fileDir)
         
         if(installationOrder){
             res.status(200).json({installationOrder, users, files})
@@ -159,6 +159,7 @@ const getInstallationOrder = asyncHandler(async (req, res) =>{
             throw new Error('Installation order not found')
         }
     }catch(error){
+        console.log(error.message)
         res.status(400)
         throw error
     }
