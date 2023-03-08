@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const userType = mongoose.Schema({
     typeId:{
@@ -13,4 +13,4 @@ const userType = mongoose.Schema({
     },
 })
 
-module.exports = mongoose.model('UserType', userType);
+module.exports = mongoose.model('UserType', userType)

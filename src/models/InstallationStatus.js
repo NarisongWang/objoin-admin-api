@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const installationStatusSchema = mongoose.Schema({
     statusId:{
@@ -13,4 +13,4 @@ const installationStatusSchema = mongoose.Schema({
     },
 })
 
-module.exports = mongoose.model('InstallationStatus', installationStatusSchema);
+module.exports = mongoose.model('InstallationStatus', installationStatusSchema)

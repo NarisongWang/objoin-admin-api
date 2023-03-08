@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const kitchenInstallChecklist = mongoose.Schema({
     index:{
@@ -19,4 +19,4 @@ const kitchenInstallChecklist = mongoose.Schema({
     },
 })
 
-module.exports = mongoose.model('KitchenInstallChecklist', kitchenInstallChecklist);
+module.exports = mongoose.model('KitchenInstallChecklist', kitchenInstallChecklist)

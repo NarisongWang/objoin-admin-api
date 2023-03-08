@@ -11,40 +11,45 @@ const KitchenInstallChecklist = require('../models/KitchenInstallChecklist');
 // @route   /admin/register
 // @acccess Private and only super admin can access
 const registerAdmin = asyncHandler( async( req, res ) =>{
-    const { name, email, password } = req.body;
-    if(!name || !email || !password){
-        res.status(400)
-        throw new Error('Please include all fields')
-    }
+    try {
+        const { name, email, password } = req.body;
+        if(!name || !email || !password){
+            res.status(400)
+            throw new Error('Please include all fields')
+        }
 
-    //Find if user already exists
-    const adminExists = await Admin.findOne({email})
-    if(adminExists){
-        res.status(400)
-        throw new Error('Admin account already exists')
-    }
+        //Find if user already exists
+        const adminExists = await Admin.findOne({email})
+        if(adminExists){
+            res.status(400)
+            throw new Error('Admin account already exists')
+        }
 
-    //Hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password,salt)
+        //Hash password
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password,salt)
 
-    //Create admin account
-    const admin = await Admin.create({
-        name,
-        email,
-        password:hashedPassword
-    })
-
-    if(admin){
-        res.status(201).json({
-            _id: admin._id,
-            name: admin.name,
-            email: admin.email,
-            token: generateToken(admin._id)
+        //Create admin account
+        const admin = await Admin.create({
+            name,
+            email,
+            password:hashedPassword
         })
-    }else{
+
+        if(admin){
+            res.status(201).json({
+                _id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                token: generateToken(admin._id)
+            })
+        }else{
+            res.status(400)
+            throw new Error('Invalid user data')
+        }
+    } catch (error) {
         res.status(400)
-        throw new Error('Invalid user data')
+        throw error
     }
 }) 
 
@@ -53,31 +58,36 @@ const registerAdmin = asyncHandler( async( req, res ) =>{
 // @route   /admin/login
 // @acccess Public
 const loginAdmin = asyncHandler( async( req, res ) =>{
-    const { email, password } = req.body;
+    try{
+        const { email, password } = req.body;
 
-    const admin = await Admin.findOne({email}) 
-    if(admin && (await bcrypt.compare(password, admin.password))){
+        const admin = await Admin.findOne({email}) 
+        if(admin && (await bcrypt.compare(password, admin.password))){
 
-        const workStatus = await InstallationStatus.find({})
-        const userType = await UserType.find({})
-        const checkList = await KitchenInstallChecklist.find({})
+            const workStatus = await InstallationStatus.find({})
+            const userType = await UserType.find({})
+            const checkList = await KitchenInstallChecklist.find({})
 
-        res.status(200).json({
-            user:{
-                _id: admin._id,
-                name: admin.name,
-                email: admin.email,
-                token: generateToken(admin._id)
-            },
-            dictionary:{
-                workStatus:workStatus,
-                userType:userType,
-                checkList:checkList
-            }
-        })
-    }else{
-        res.status(401)
-        throw new Error('Invalid email or password')
+            res.status(200).json({
+                user:{
+                    _id: admin._id,
+                    name: admin.name,
+                    email: admin.email,
+                    token: generateToken(admin._id)
+                },
+                dictionary:{
+                    workStatus:workStatus,
+                    userType:userType,
+                    checkList:checkList
+                }
+            })
+        }else{
+            res.status(401)
+            throw new Error('Invalid email or password')
+        }
+    } catch (error) {
+        res.status(400)
+        throw error
     }
 })
 

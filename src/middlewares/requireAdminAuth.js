@@ -1,6 +1,6 @@
-const asyncHandler = require('express-async-handler');
-const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin');
+const asyncHandler = require('express-async-handler')
+const jwt = require('jsonwebtoken')
+const Admin = require('../models/Admin')
 
 const adminAuth = asyncHandler(async (req, res, next) =>{
     let token

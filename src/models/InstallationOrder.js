@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const installationOrderSchema = mongoose.Schema({
     installationOrderNumber:{
@@ -127,4 +127,4 @@ const installationOrderSchema = mongoose.Schema({
     timestamps:true
 })
 
-module.exports = mongoose.model('InstallationOrder', installationOrderSchema);
+module.exports = mongoose.model('InstallationOrder', installationOrderSchema)
