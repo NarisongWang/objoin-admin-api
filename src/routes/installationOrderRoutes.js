@@ -2,11 +2,12 @@ const express = require('express');
 const { adminAuth } = require('../middlewares/requireAdminAuth');
 
 const { 
-    loadInstallationOrders,
+    createInstallationOrders,
     setupInstallationOrder,
     editInstallationOrder,
     deleteInstallationOrder,
     getInstallationOrders,
+    getTotalCount,
     getInstallationOrder,
     updateInstallationOrder,
     closeInstallationOrder
@@ -14,14 +15,15 @@ const {
 
 const router = express.Router();
 
-router.post('/admin/loadinstallationorders', adminAuth, loadInstallationOrders)
+router.post('/admin/createinstallationorders', adminAuth, createInstallationOrders)
 router.post('/admin/setupinstallationorder', adminAuth, setupInstallationOrder)
 router.post('/admin/editinstallationorder', adminAuth, editInstallationOrder)
-router.post('/admin/deleteinstallationorder', adminAuth, deleteInstallationOrder)
-router.get('/admin/installationorders', adminAuth, getInstallationOrders)
+router.post('/admin/installationorders', adminAuth, getInstallationOrders)
 router.route('/admin/installationorders/:id')
       .get(adminAuth, getInstallationOrder)
       .put(adminAuth, updateInstallationOrder)
+router.post('/admin/countorders', adminAuth, getTotalCount)
 router.post('/admin/closeorder', adminAuth, closeInstallationOrder)
+router.post('/admin/deleteorder', adminAuth, deleteInstallationOrder)
 
 module.exports = router;

@@ -7,7 +7,7 @@ const { findPdfFiles, uploadPdfFilesToAzure, deleteInstallationOrderDirectoryFro
 // @request POST
 // @route   /admin/loadinstallationorders
 // @acccess Private & protected by adminAuth
-const loadInstallationOrders = asyncHandler(async (req, res) =>{
+const createInstallationOrders = asyncHandler(async (req, res) =>{
     try {
         const {installationOrderLoads} = req.body
         for (let i = 0; i < installationOrderLoads.length; i++) {
@@ -97,7 +97,7 @@ const editInstallationOrder = asyncHandler(async (req, res) =>{
 // @acccess Private & protected by adminAuth
 const deleteInstallationOrder = asyncHandler(async (req, res) =>{
     try{
-        const {installationOrderId} = req.body
+        const { installationOrderId } = req.body
         const installationOrder = await InstallationOrder.findById(installationOrderId)
         //delete installation order id from installationOrders field for deliverers and installers
         await deleteUserInstallationOrdersInfo(installationOrder)
@@ -121,14 +121,38 @@ const deleteInstallationOrder = asyncHandler(async (req, res) =>{
 })
 
 // @desc    get all installation orders
-// @request GET
+// @request POST
 // @route   /admin/installationorders
 // @acccess Private & protected by adminAuth
 const getInstallationOrders = asyncHandler(async (req, res) =>{
     try{
-        const installationOrders = await InstallationOrder.find({}).sort({installationOrderNumber:-1})
+        const { firstPageIndex, pageSize, searchText } = req.body
+        const installationOrders = await InstallationOrder.find({installationOrderNumber: {$regex:`.*${searchText}.*`}})
+            .sort({installationOrderNumber:-1})
+            .skip(firstPageIndex)
+            .limit(pageSize)
         if(installationOrders){
             res.status(200).send(installationOrders)
+        }else{
+            res.status(400)
+            throw new Error('Invalid query')
+        }
+    }catch(error){
+        res.status(400)
+        throw error
+    }
+})
+
+// @desc    get installation order counts
+// @request POST
+// @route   /admin/countorders
+// @acccess Private & protected by adminAuth
+const getTotalCount = asyncHandler(async (req, res) =>{
+    try{
+        const { searchText } = req.body
+        const count = await InstallationOrder.countDocuments({installationOrderNumber: {$regex:`.*${searchText}.*`}})
+        if(count){
+            res.status(200).send({totalCount:count})
         }else{
             res.status(400)
             throw new Error('Invalid query')
@@ -196,7 +220,7 @@ const updateInstallationOrder = asyncHandler(async (req, res) =>{
 // @acccess Private & protected by adminAuth
 const closeInstallationOrder = asyncHandler(async (req, res) =>{
     try{
-        const {installationOrderId} = req.body
+        const { installationOrderId } = req.body
         const installationOrder = await InstallationOrder.findByIdAndUpdate(
             installationOrderId, 
             { workStatus: 5 }, 
@@ -264,11 +288,12 @@ const deleteUserInstallationOrdersInfo = (installationOrder) =>{
 }
 
 module.exports = {
-    loadInstallationOrders,
+    createInstallationOrders,
     setupInstallationOrder,
     editInstallationOrder,
     deleteInstallationOrder,
     getInstallationOrders,
+    getTotalCount,
     getInstallationOrder,
     updateInstallationOrder,
     closeInstallationOrder
