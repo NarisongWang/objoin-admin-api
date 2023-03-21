@@ -5,7 +5,6 @@ const Admin = require('../models/Admin')
 const User = require('../models/User')
 const UserType = require('../models/UserType')
 const InstallationStatus = require('../models/InstallationStatus')
-const KitchenInstallChecklist = require('../models/KitchenInstallChecklist')
 
 // @desc    Register a new admin
 // @request POST
@@ -67,7 +66,6 @@ const loginAdmin = asyncHandler( async( req, res ) =>{
 
             const workStatus = await InstallationStatus.find({})
             const userType = await UserType.find({})
-            const checkList = await KitchenInstallChecklist.find({})
 
             res.status(200).json({
                 user:{
@@ -79,7 +77,6 @@ const loginAdmin = asyncHandler( async( req, res ) =>{
                 dictionary:{
                     workStatus:workStatus,
                     userType:userType,
-                    checkList:checkList
                 }
             })
         }else{

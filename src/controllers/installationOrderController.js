@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/User')
 const InstallationOrder = require('../models/InstallationOrder')
+const CheckList = require('../models/KitchenInstallChecklist')
 const { findPdfFiles, uploadPdfFilesToAzure, deleteInstallationOrderDirectoryFromAzure } = require('./fileController')
 
 // @desc    create installation orders from loaded sales orders
@@ -38,12 +39,15 @@ const createInstallationOrders = asyncHandler(async (req, res) =>{
 const setupInstallationOrder = asyncHandler(async (req, res) =>{
     try {
         const {installationOrderId, update} = req.body
+        //load check list
+        const checkList = await CheckList.find({})
+        update.checkList = checkList
         const updateInstallationOrder = await InstallationOrder.findByIdAndUpdate(
             installationOrderId, 
             update, 
             { new : true }
         )
-        //add installation order id to installationOrders field
+        //add installation order id to user's installationOrders field
         await updateUserInstallationOrdersInfo(update, installationOrderId)
         //upload pdf files to Azure blob storage
         await uploadPdfFilesToAzure(updateInstallationOrder.installationOrderNumber, update.localFilePath, update.files)
