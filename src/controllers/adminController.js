@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const mailer = require('nodemailer')
 const Admin = require('../models/Admin')
 const User = require('../models/User')
 const UserType = require('../models/UserType')
@@ -108,13 +109,95 @@ const getAllUsers = asyncHandler( async(req, res) => {
     }
 })
 
+// @desc    Register a new user
+// @request POST
+// @route   /admin/activateuser
+// @acccess Private, protected by admin auth
+
+const activateUser = asyncHandler( async( req, res ) =>{
+    try{
+        const { fullName, email, userType } = req.body;
+        if(!fullName || !email ||!userType){
+            res.status(400)
+            throw new Error('Please include all fields')
+        }
+
+        //Find if user already exists
+        const userExists = await User.findOne({email})
+        if(userExists){
+            res.status(400)
+            throw new Error('This account has already been activated')
+        }
+
+        //random 6 digit initial password
+        const password = Math.floor(100000 + Math.random() * 900000)
+        //Generate email validation token
+        const email_token = generateToken2(email);
+        //Create user account
+        const user = await User.create({
+            email,
+            password,
+            fullName,
+            isActive: false,
+            userType,
+            token: email_token
+        })
+
+        //send verification email to account
+        const trans = mailer.createTransport({
+            service: 'gmail',
+            auth:{
+                user: process.env.EMAIL_ADDR,
+                pass: process.env.EMAIL_PASS
+            }
+        })
+
+        const mailOptions = {
+            from: process.env.EMAIL_ADDR,
+            to: email,
+            subject: 'Activate your account ',
+            html: `Please open the below link in browser to activate your user account!<br>
+            This link will expair in 3 days,<br>
+            ${process.env.APP_URL}/activate/${email_token}/${user.email}`
+        }
+
+        trans.sendMail(mailOptions, function(error, info){
+            if (error) {
+                throw new Error('Failed to send validation email!')
+            } 
+        })
+
+        if(user){
+            res.status(201).json({
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email
+            })
+        }else{
+            res.status(400)
+            throw new Error('Invalid user data')
+        }
+    } catch (error) {
+        res.status(400)
+        throw error
+    }
+}) 
+
 //Generate token
 const generateToken = (id) =>{
     return jwt.sign({ id }, process.env.JWT_SECRET_ADMIN)
 }
 
+//Generate token for email validation
+const generateToken2 = (email) =>{
+    return jwt.sign({ email }, process.env.JWT_SECRET_EMAIL,{
+        expiresIn: '3d',
+    })
+}
+
 module.exports = {
     getAllUsers,
     registerAdmin,
-    loginAdmin
+    loginAdmin,
+    activateUser
 }

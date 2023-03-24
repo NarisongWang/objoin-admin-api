@@ -10,22 +10,22 @@ const { findPdfFiles, uploadPdfFilesToAzure, deleteInstallationOrderDirectoryFro
 // @acccess Private & protected by adminAuth
 const createInstallationOrders = asyncHandler(async (req, res) =>{
     try {
-        const {installationOrderLoads} = req.body
-        for (let i = 0; i < installationOrderLoads.length; i++) {
-            const installationOrderLoad = installationOrderLoads[i]
-            if(installationOrderLoad.orderDetails){
-                const orderDetails = installationOrderLoad.orderDetails.split('|')
+        const { salesOrders } = req.body
+        for (let i = 0; i < salesOrders.length; i++) {
+            const installationOrder = salesOrders[i]
+            if(installationOrder.orderDetails){
+                const orderDetails = installationOrder.orderDetails.split('|')
                 let checkItems = []
                 if(orderDetails && orderDetails.length>0){
                     for (let j = 0; j < orderDetails.length; j++) {
                         checkItems.push(orderDetails[j].replaceAll('&amp;', 'and'))
                     }
                 }
-                installationOrderLoad.checkItems = checkItems
+                installationOrder.checkItems = checkItems
             }
-            await InstallationOrder.create(installationOrderLoad)
+            await InstallationOrder.create(installationOrder)
         }
-        res.status(200).json(installationOrderLoads)
+        res.status(200).json(salesOrders)
     } catch (error) {
         res.status(400)
         throw error
@@ -106,7 +106,7 @@ const deleteInstallationOrder = asyncHandler(async (req, res) =>{
         //delete installation order id from installationOrders field for deliverers and installers
         await deleteUserInstallationOrdersInfo(installationOrder)
 
-        //delete document from InstallationOrder collection
+        //delete InstallationOrder from InstallationOrder collection
         const result = await InstallationOrder.findByIdAndDelete(installationOrderId)
 
         //delete all documents under the installation order number on Azure blob storage

@@ -15,9 +15,9 @@ const {
 
 const router = express.Router();
 
-router.post('/admin/createinstallationorders', adminAuth, createInstallationOrders)
-router.post('/admin/setupinstallationorder', adminAuth, setupInstallationOrder)
-router.post('/admin/editinstallationorder', adminAuth, editInstallationOrder)
+router.post('/admin/createorders', adminAuth, createInstallationOrders)
+router.post('/admin/setuporder', adminAuth, setupInstallationOrder)
+router.post('/admin/editorder', adminAuth, editInstallationOrder)
 router.post('/admin/installationorders', adminAuth, getInstallationOrders)
 router.route('/admin/installationorders/:id')
       .get(adminAuth, getInstallationOrder)
