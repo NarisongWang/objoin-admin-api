@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const adminRoutes = require('./routes/adminRoutes')
 const installationOrderRoutes = require('./routes/installationOrderRoutes')
 const mssqlRoutes = require('./routes/mssqlRoutes')
+const checkListRoutes = require('./routes/checkListRoutes')
 const { errorHandler } = require('./middlewares/errorHandler')
 
 const app = express()
@@ -17,6 +18,7 @@ app.use(helmet())
 app.use(adminRoutes)
 app.use(installationOrderRoutes)
 app.use(mssqlRoutes)
+app.use(checkListRoutes)
 
 app.use(errorHandler)
 
@@ -29,6 +31,7 @@ mongoose.connection.on("connected", () => {
 
 app.use('*', ( req, res ) => {
     res.status(404)
+    console.log(req.method+': '+req.baseUrl)
     throw new Error('Resource not found.')
 })
 

@@ -65,7 +65,7 @@ const findPdfFiles = (dir) =>{
     return new Promise(async(resolve, reject) =>{
         try {
             let files = []
-            const filesInDirectory = await fs.readdirSync(dir)
+            const filesInDirectory = fs.readdirSync(dir)
             for (const file of filesInDirectory) {
                 const absolute = path.join(dir, file)
                 if (fs.statSync(absolute).isDirectory()) {
@@ -78,7 +78,8 @@ const findPdfFiles = (dir) =>{
             }
             resolve(files)
         } catch (error) {
-            reject(error)
+            //reject(error)
+            resolve([])
         }
     })
 }

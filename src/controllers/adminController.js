@@ -183,6 +183,71 @@ const activateUser = asyncHandler( async( req, res ) =>{
     }
 }) 
 
+// @desc    Resend a new validation email
+// @request POST
+// @route   /admin/resendemail
+// @acccess Private, protected by admin auth
+
+const resendEmail = asyncHandler( async( req, res ) =>{
+    try{
+        const { email } = req.body;
+        if(!email){
+            res.status(400)
+            throw new Error('Please include email')
+        }
+
+        //Find if user already exists
+        const userExists = await User.findOne({email})
+        if(userExists&&userExists.isActive){
+            res.status(400)
+            throw new Error('This account is currently active')
+        }
+
+        //Generate email validation token
+        const email_token = generateToken2(email)
+
+        await User.findByIdAndUpdate(
+            userExists._id,
+            { token : email_token }, 
+            { new : true }
+        )
+        
+        //send verification email to account
+        const trans = mailer.createTransport({
+            service: 'gmail',
+            auth:{
+                user: process.env.EMAIL_ADDR,
+                pass: process.env.EMAIL_PASS
+            }
+        })
+
+        const mailOptions = {
+            from: process.env.EMAIL_ADDR,
+            to: email,
+            subject: 'Activate your account ',
+            html: `Please open the below link in browser to activate your user account!<br>
+            This link will expair in 3 days,<br>
+            ${process.env.APP_URL}/activate/${email_token}/${email}`
+        }
+
+        trans.sendMail(mailOptions, function(error, info){
+            if (error) {
+                throw new Error('Failed to send validation email!')
+            } 
+        })
+
+        res.status(201).json({
+            _id: userExists._id,
+            fullName: userExists.fullName,
+            email: userExists.email
+        })
+
+    } catch (error) {
+        res.status(400)
+        throw error
+    }
+}) 
+
 //Generate token
 const generateToken = (id) =>{
     return jwt.sign({ id }, process.env.JWT_SECRET_ADMIN)
@@ -199,5 +264,6 @@ module.exports = {
     getAllUsers,
     registerAdmin,
     loginAdmin,
-    activateUser
+    activateUser,
+    resendEmail
 }
