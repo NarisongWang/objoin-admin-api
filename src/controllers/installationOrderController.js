@@ -139,7 +139,7 @@ const getInstallationOrders = asyncHandler(async (req, res) =>{
             res.status(200).send(installationOrders)
         }else{
             res.status(400)
-            throw new Error('Invalid query')
+            throw new Error('Invalid query ')
         }
     }catch(error){
         res.status(400)
@@ -155,12 +155,7 @@ const getTotalCount = asyncHandler(async (req, res) =>{
     try{
         const { searchText } = req.body
         const count = await InstallationOrder.countDocuments({installationOrderNumber: {$regex:`.*${searchText}.*`}})
-        if(count){
-            res.status(200).send({totalCount:count})
-        }else{
-            res.status(400)
-            throw new Error('Invalid query')
-        }
+        res.status(200).send({totalCount:count})
     }catch(error){
         res.status(400)
         throw error
