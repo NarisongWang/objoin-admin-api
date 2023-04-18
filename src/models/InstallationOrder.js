@@ -65,7 +65,7 @@ const installationOrderSchema = mongoose.Schema({
         type: String,
         default: ''
     },
-    photos1:[
+    photos0:[
         {
             type: String,
         }
@@ -74,7 +74,7 @@ const installationOrderSchema = mongoose.Schema({
         type: String,
         default: ''
     },
-    photos2:[
+    photos1:[
         {
             type: String,
         }
